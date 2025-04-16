@@ -1,3 +1,4 @@
+
 let startTime = 600;
 let time1 = startTime;
 let time2 = startTime;
@@ -98,10 +99,6 @@ function togglePause() {
 function setMode(mode) {
   const adv = document.getElementById("advanced-settings");
   adv.style.display = (mode === "advanced") ? "block" : "none";
-}
-
-function toggleBigFont() {
-  document.body.classList.toggle('big-font');
 }
 
 updateDisplay();
