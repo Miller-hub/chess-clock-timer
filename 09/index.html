@@ -70,18 +70,13 @@
 <script>
 function toggleFullscreen() {
   const btn = document.getElementById("fullscreenBtn");
-  const body = document.body;
-
-  const btn = document.getElementById("fullscreenBtn");
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().then(() => {
       btn.innerText = "離開全螢幕";
-      body.classList.add('minimal');
     });
   } else {
     document.exitFullscreen().then(() => {
       btn.innerText = "進入全螢幕";
-      body.classList.remove('minimal');
     });
   }
 }
