@@ -102,3 +102,42 @@ body.minimal .timers {
   align-items: center;
   gap: 30px;
 }
+
+
+/* 手機專用視覺優化 */
+@media (max-width: 768px) {
+  .time {
+    font-size: 64px;
+  }
+
+  .player h2 {
+    font-size: 28px;
+  }
+
+  button {
+    font-size: 24px;
+    padding: 16px 24px;
+  }
+
+  .setup input,
+  #voiceThreshold,
+  #alertThreshold {
+    font-size: 20px;
+    padding: 4px;
+    width: 80px;
+  }
+
+  .setup label,
+  #voice-settings label,
+  #advanced-settings label {
+    font-size: 20px;
+  }
+
+  .mode-select label {
+    font-size: 20px;
+  }
+
+  .container {
+    padding: 20px;
+  }
+}
