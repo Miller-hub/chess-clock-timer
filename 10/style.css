@@ -141,38 +141,3 @@ body.minimal .timers {
     padding: 20px;
   }
 }
-
-
-/* 再加大按鈕與文字尺寸給長輩模式 */
-@media (max-width: 768px) {
-  .time {
-    font-size: 80px;
-  }
-
-  .player h2 {
-    font-size: 36px;
-  }
-
-  button {
-    font-size: 28px;
-    padding: 20px 28px;
-  }
-
-  .setup input,
-  #voiceThreshold,
-  #alertThreshold {
-    font-size: 24px;
-    padding: 6px;
-    width: 100px;
-  }
-
-  .setup label,
-  #voice-settings label,
-  #advanced-settings label {
-    font-size: 24px;
-  }
-
-  .mode-select label {
-    font-size: 24px;
-  }
-}
