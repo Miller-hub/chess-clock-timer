@@ -1,4 +1,3 @@
-
 let startTime = 600;
 let time1 = startTime;
 let time2 = startTime;
@@ -6,7 +5,6 @@ let currentPlayer = null;
 let timerInterval = null;
 let isPaused = false;
 let incrementPerMove = 0;
-let warningThreshold = 10;
 
 function formatTime(sec) {
   let m = Math.floor(sec / 60);
@@ -21,8 +19,8 @@ function updateDisplay() {
   time1Elem.innerText = formatTime(time1);
   time2Elem.innerText = formatTime(time2);
 
-  time1Elem.classList.toggle("red", time1 <= warningThreshold);
-  time2Elem.classList.toggle("red", time2 <= warningThreshold);
+  time1Elem.classList.toggle("red", time1 <= 10);
+  time2Elem.classList.toggle("red", time2 <= 10);
 }
 
 function switchPlayer(player) {
@@ -74,11 +72,9 @@ function applyStartTime() {
   const minutes = parseInt(document.getElementById("startMinutes").value);
   const seconds = parseInt(document.getElementById("startSeconds").value);
   const increment = parseInt(document.getElementById("incrementSeconds").value || "0");
-  const warning = parseInt(document.getElementById("warningThreshold").value || "10");
 
   startTime = (minutes * 60) + seconds;
   incrementPerMove = increment;
-  warningThreshold = warning;
   resetTimers();
 }
 

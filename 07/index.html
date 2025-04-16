@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -22,14 +21,17 @@
       <input type="number" id="startMinutes" value="10" min="0" max="60"> 分
       <input type="number" id="startSeconds" value="0" min="0" max="59"> 秒
       <button onclick="applyStartTime()">套用時間</button>
-      <br />
-      <label>紅色警告秒數：</label>
-      <input type="number" id="warningThreshold" value="10" min="0" max="60"> 秒
     </div>
 
     <div id="advanced-settings" style="display:none;">
       <label>每步加秒：</label>
       <input type="number" id="incrementSeconds" value="0" min="0" max="60"> 秒
+    
+    <div class="advanced-voice-options" id="voice-settings" style="display:block;">
+      <label><input type="checkbox" id="enableVoice" checked> 啟用語音倒數提示</label><br/>
+      <label>語音讀秒起點（秒）：<input type="number" id="voiceThreshold" value="10" min="1" max="60"></label><br/>
+      <label>紅色警示 / 嗶聲起點（秒）：<input type="number" id="alertThreshold" value="5" min="1" max="60"></label>
+    </div>
     </div>
 
     <div class="timers">

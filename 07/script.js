@@ -1,4 +1,3 @@
-
 let startTime = 600;
 let time1 = startTime;
 let time2 = startTime;
@@ -6,7 +5,6 @@ let currentPlayer = null;
 let timerInterval = null;
 let isPaused = false;
 let incrementPerMove = 0;
-let warningThreshold = 10;
 
 function formatTime(sec) {
   let m = Math.floor(sec / 60);
@@ -21,8 +19,8 @@ function updateDisplay() {
   time1Elem.innerText = formatTime(time1);
   time2Elem.innerText = formatTime(time2);
 
-  time1Elem.classList.toggle("red", time1 <= warningThreshold);
-  time2Elem.classList.toggle("red", time2 <= warningThreshold);
+  time1Elem.classList.toggle("red", time1 <= 10);
+  time2Elem.classList.toggle("red", time2 <= 10);
 }
 
 function switchPlayer(player) {
@@ -74,11 +72,9 @@ function applyStartTime() {
   const minutes = parseInt(document.getElementById("startMinutes").value);
   const seconds = parseInt(document.getElementById("startSeconds").value);
   const increment = parseInt(document.getElementById("incrementSeconds").value || "0");
-  const warning = parseInt(document.getElementById("warningThreshold").value || "10");
 
   startTime = (minutes * 60) + seconds;
   incrementPerMove = increment;
-  warningThreshold = warning;
   resetTimers();
 }
 
@@ -102,3 +98,87 @@ function setMode(mode) {
 }
 
 updateDisplay();
+
+
+const beepSound = new Audio("beep.mp3");
+
+function playBeep() {
+  beepSound.currentTime = 0;
+  beepSound.play();
+}
+
+let lastAnnounced = null;
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "zh-TW";
+  window.speechSynthesis.speak(msg);
+}
+
+// 修改 updateDisplay 加上語音與嗶聲警告
+const originalUpdateDisplay = updateDisplay;
+updateDisplay = function () {
+  originalUpdateDisplay();
+
+  // 每秒嗶：剩下 5 秒內
+  if (currentPlayer === 1 && time1 > 0 && time1 <= 5) playBeep();
+  if (currentPlayer === 2 && time2 > 0 && time2 <= 5) playBeep();
+
+  // 語音倒數：剩 10 秒內開始唸數字
+  let remaining = (currentPlayer === 1) ? time1 : time2;
+  if (remaining <= 10 && remaining > 0 && lastAnnounced !== remaining) {
+    speak(remaining.toString());
+    lastAnnounced = remaining;
+  }
+};
+
+// 修改 switchPlayer 時清空語音提示狀態並播放嗶聲
+const originalSwitchPlayer = switchPlayer;
+switchPlayer = function (player) {
+  lastAnnounced = null;
+  playBeep();
+  originalSwitchPlayer(player);
+};
+
+
+function getVoiceEnabled() {
+  return document.getElementById("enableVoice").checked;
+}
+
+function getVoiceThreshold() {
+  return parseInt(document.getElementById("voiceThreshold").value) || 10;
+}
+
+function getAlertThreshold() {
+  return parseInt(document.getElementById("alertThreshold").value) || 5;
+}
+
+// 覆蓋 updateDisplay，根據設定的秒數控制
+updateDisplay = function () {
+  const time1Elem = document.getElementById('time1');
+  const time2Elem = document.getElementById('time2');
+
+  time1Elem.innerText = formatTime(time1);
+  time2Elem.innerText = formatTime(time2);
+
+  const alertThreshold = getAlertThreshold();
+
+  time1Elem.classList.toggle("red", time1 <= alertThreshold);
+  time2Elem.classList.toggle("red", time2 <= alertThreshold);
+
+  if (currentPlayer === 1 && time1 > 0 && time1 <= alertThreshold) playBeep();
+  if (currentPlayer === 2 && time2 > 0 && time2 <= alertThreshold) playBeep();
+
+  const voiceThreshold = getVoiceThreshold();
+  let remaining = (currentPlayer === 1) ? time1 : time2;
+  if (
+    getVoiceEnabled() &&
+    remaining <= voiceThreshold &&
+    remaining > 0 &&
+    lastAnnounced !== remaining
+  ) {
+    speak(remaining.toString());
+    lastAnnounced = remaining;
+  }
+}
