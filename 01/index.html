@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>雙人棋鐘計時器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>雙人棋鐘計時器</h1>
+
+    <div class="timers">
+      <div class="player" id="player1">
+        <h2>玩家 A</h2>
+        <div class="time" id="time1">10:00</div>
+        <button onclick="switchPlayer(1)">輪到我</button>
+      </div>
+
+      <div class="player" id="player2">
+        <h2>玩家 B</h2>
+        <div class="time" id="time2">10:00</div>
+        <button onclick="switchPlayer(2)">輪到我</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button onclick="resetTimers()">重設</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
