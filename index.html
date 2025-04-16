@@ -3,55 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="雙人棋鐘計時器，支援一般與進階模式，自訂分鐘與秒數時間，適用圍棋、象棋、桌遊對局。" />
-  <title>雙人棋鐘計時器｜一般與進階模式</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>雙人棋鐘計時器｜手機友善版</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      padding: 30px;
+    }
+    .timers {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .player {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 200px;
+    }
+    .player.active {
+      background-color: #d0f0ff;
+      border: 2px solid #0077cc;
+    }
+    .time {
+      font-size: 48px;
+      margin: 10px 0;
+    }
+    .time.red {
+      color: red;
+      font-weight: bold;
+      animation: flash 1s infinite;
+    }
+    @keyframes flash {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .controls {
+      margin-top: 30px;
+    }
+    .setup {
+      margin-bottom: 20px;
+    }
+    .setup input {
+      width: 60px;
+      font-size: 16px;
+      text-align: center;
+      margin: 0 10px;
+    }
+    .input-group {
+      display: inline-flex;
+      align-items: center;
+      margin: 5px;
+    }
+    .input-group input {
+      width: 60px;
+      text-align: center;
+      font-size: 20px;
+      margin: 0 5px;
+    }
+    .mode-select {
+      margin: 10px 0;
+    }
+    .mode-select label {
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    .big-font {
+      font-size: 1.5em;
+    }
+    .big-font .time {
+      font-size: 80px;
+    }
+    .big-font button {
+      font-size: 28px;
+      padding: 20px 30px;
+    }
+    .big-font label,
+    .big-font input,
+    .big-font h2 {
+      font-size: 24px;
+    }
+  </style>
 </head>
 <body>
   <button onclick="toggleBigFont()" style="position:fixed;top:10px;right:10px;z-index:999;">A+</button>
   <div class="container">
     <h1>雙人棋鐘計時器</h1>
-
     <div class="mode-select">
       <label><input type="radio" name="mode" value="basic" checked onchange="setMode('basic')"> 一般模式</label>
       <label><input type="radio" name="mode" value="advanced" onchange="setMode('advanced')"> 進階模式</label>
     </div>
-
     <div class="setup">
       <label>每人時間：</label>
-      <input type="number" id="startMinutes" value="10" min="0" max="60"> 分
-      <input type="number" id="startSeconds" value="0" min="0" max="59"> 秒
-      <button onclick="applyStartTime()">套用時間</button>
-      <br />
+      <div class="input-group">
+        <button onclick="adjust('minutes', -1)">−</button>
+        <input type="number" id="startMinutes" value="10" readonly>
+        <button onclick="adjust('minutes', 1)">＋</button> 分
+      </div>
+      <div class="input-group">
+        <button onclick="adjust('seconds', -1)">−</button>
+        <input type="number" id="startSeconds" value="0" readonly>
+        <button onclick="adjust('seconds', 1)">＋</button> 秒
+      </div>
+      <br/>
       <label>紅色警告秒數：</label>
-      <input type="number" id="warningThreshold" value="10" min="0" max="60"> 秒
+      <input type="number" id="warningThreshold" value="10" min="0" max="60">
+      <button onclick="applyStartTime()">套用時間</button>
     </div>
-
     <div id="advanced-settings" style="display:none;">
       <label>每步加秒：</label>
       <input type="number" id="incrementSeconds" value="0" min="0" max="60"> 秒
     </div>
-
     <div class="timers">
       <div class="player" id="player1">
         <h2>玩家 A</h2>
         <div class="time" id="time1">10:00</div>
         <button onclick="switchPlayer(1)">輪到我</button>
       </div>
-
       <div class="player" id="player2">
         <h2>玩家 B</h2>
         <div class="time" id="time2">10:00</div>
         <button onclick="switchPlayer(2)">輪到我</button>
       </div>
     </div>
-
     <div class="controls">
       <button onclick="resetTimers()">重設</button>
       <button onclick="togglePause()" id="pauseBtn">暫停</button>
     </div>
   </div>
+  <script>
+    let startTime = 600;
+    let time1 = startTime;
+    let time2 = startTime;
+    let currentPlayer = null;
+    let timerInterval = null;
+    let isPaused = false;
+    let incrementPerMove = 0;
+    let warningThreshold = 10;
 
-  <script src="script.js"></script>
+    function formatTime(sec) {
+      let m = Math.floor(sec / 60);
+      let s = sec % 60;
+      return `${m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function updateDisplay() {
+      const time1Elem = document.getElementById('time1');
+      const time2Elem = document.getElementById('time2');
+      time1Elem.innerText = formatTime(time1);
+      time2Elem.innerText = formatTime(time2);
+      time1Elem.classList.toggle("red", time1 <= warningThreshold);
+      time2Elem.classList.toggle("red", time2 <= warningThreshold);
+    }
+
+    function switchPlayer(player) {
+      if (isPaused) return;
+      clearInterval(timerInterval);
+      if (currentPlayer && document.querySelector('input[name="mode"]:checked').value === 'advanced') {
+        if (currentPlayer === 1) time1 += incrementPerMove;
+        else time2 += incrementPerMove;
+      }
+      document.getElementById("player1").classList.remove("active");
+      document.getElementById("player2").classList.remove("active");
+      if (player === 1) document.getElementById("player1").classList.add("active");
+      else document.getElementById("player2").classList.add("active");
+      currentPlayer = player;
+      timerInterval = setInterval(() => {
+        if (currentPlayer === 1) {
+          time1--;
+          if (time1 <= 0) clearInterval(timerInterval);
+        } else {
+          time2--;
+          if (time2 <= 0) clearInterval(timerInterval);
+        }
+        updateDisplay();
+      }, 1000);
+    }
+
+    function resetTimers() {
+      clearInterval(timerInterval);
+      time1 = startTime;
+      time2 = startTime;
+      currentPlayer = null;
+      isPaused = false;
+      document.getElementById("pauseBtn").innerText = "暫停";
+      document.getElementById("player1").classList.remove("active");
+      document.getElementById("player2").classList.remove("active");
+      updateDisplay();
+    }
+
+    function applyStartTime() {
+      const minutes = parseInt(document.getElementById("startMinutes").value);
+      const seconds = parseInt(document.getElementById("startSeconds").value);
+      const increment = parseInt(document.getElementById("incrementSeconds").value || "0");
+      const warning = parseInt(document.getElementById("warningThreshold").value || "10");
+      startTime = (minutes * 60) + seconds;
+      incrementPerMove = increment;
+      warningThreshold = warning;
+      resetTimers();
+    }
+
+    function togglePause() {
+      const pauseBtn = document.getElementById("pauseBtn");
+      if (!isPaused) {
+        clearInterval(timerInterval);
+        isPaused = true;
+        pauseBtn.innerText = "繼續";
+      } else {
+        isPaused = false;
+        pauseBtn.innerText = "暫停";
+        if (currentPlayer) switchPlayer(currentPlayer);
+      }
+    }
+
+    function setMode(mode) {
+      const adv = document.getElementById("advanced-settings");
+      adv.style.display = (mode === "advanced") ? "block" : "none";
+    }
+
+    function toggleBigFont() {
+      document.body.classList.toggle('big-font');
+    }
+
+    function adjust(type, delta) {
+      let input = document.getElementById(type === 'minutes' ? 'startMinutes' : 'startSeconds');
+      let value = parseInt(input.value) + delta;
+      if (type === 'minutes') value = Math.max(0, Math.min(60, value));
+      else value = Math.max(0, Math.min(59, value));
+      input.value = value;
+    }
+
+    updateDisplay();
+  </script>
 </body>
 </html>
