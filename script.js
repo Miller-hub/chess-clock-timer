@@ -1,3 +1,16 @@
+
+let voiceAwakened = false;
+
+function unlockSpeech() {
+  if (!voiceAwakened && window.speechSynthesis) {
+    const test = new SpeechSynthesisUtterance("語音已啟用");
+    test.lang = "zh-TW";
+    window.speechSynthesis.speak(test);
+    voiceAwakened = true;
+  }
+}
+
+
 let startTime = 600;
 let time1 = startTime;
 let time2 = startTime;
@@ -24,6 +37,7 @@ function updateDisplay() {
 }
 
 function switchPlayer(player) {
+  unlockSpeech();
   if (isPaused) return;
 
   clearInterval(timerInterval);

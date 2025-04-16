@@ -2,6 +2,15 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <!-- SEO Meta Tags -->
+  <meta name="keywords" content="棋鐘, 雙人計時器, 線上圍棋, 線上象棋, 雙人對局, chess clock, board game timer">
+  <meta name="author" content="Miller-hub">
+  <meta property="og:title" content="雙人棋鐘計時器 - 支援語音提示與加秒">
+  <meta property="og:description" content="一款適用於圍棋、象棋與桌遊的雙人線上棋鐘工具，支援語音倒數提示、加秒設定與手機桌面使用。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://miller-hub.github.io/chess-clock-timer/">
+  <meta property="og:image" content="https://miller-hub.github.io/chess-clock-timer/cover.jpg">
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="雙人棋鐘計時器，支援一般與進階模式，自訂分鐘與秒數時間，適用圍棋、象棋、桌遊對局。" />
@@ -51,11 +60,33 @@
     </div>
 
     <div class="controls">
+      
       <button onclick="resetTimers()">重設</button>
       <button onclick="togglePause()" id="pauseBtn">暫停</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  
+<script>
+function toggleFullscreen() {
+  const btn = document.getElementById("fullscreenBtn");
+  const body = document.body;
+
+  const btn = document.getElementById("fullscreenBtn");
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      btn.innerText = "離開全螢幕";
+      body.classList.add('minimal');
+    });
+  } else {
+    document.exitFullscreen().then(() => {
+      btn.innerText = "進入全螢幕";
+      body.classList.remove('minimal');
+    });
+  }
+}
+</script>
+<script src="script.js"></script>
+
 </body>
 </html>
